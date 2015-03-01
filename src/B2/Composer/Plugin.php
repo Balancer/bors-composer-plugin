@@ -10,7 +10,7 @@ class Plugin implements PluginInterface
 {
 	public function supports($packageType)
 	{
-		echo "test '$packageType'\n";
+		echo "test plugin support '$packageType'\n";
 		return 'bors-component' === $packageType;
 	}
 
