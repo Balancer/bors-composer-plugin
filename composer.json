@@ -13,10 +13,10 @@
 	"minimum-stability": "dev",
 
 	"psr-0": {
-		"B2\\Composer": "src/"
+		"B2Composer": "src/"
 	},
 
 	"extra": {
-		"class": "B2\\Composer\\Plugin"
+		"class": "B2Composer\\Plugin"
 	}
 }

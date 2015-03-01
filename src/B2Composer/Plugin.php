@@ -1,6 +1,6 @@
 <?php
 
-namespace B2\Composer;
+namespace B2Composer;
 
 class Plugin extends Composer\Installer\LibraryInstaller
 {
