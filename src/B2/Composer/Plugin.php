@@ -14,7 +14,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 {
 	public function activate(Composer $composer, IOInterface $io)
 	{
-		echo "activate plugin\n";
+//		echo "activate plugin\n";
 //		$installer = new TemplateInstaller($io, $composer);
 //		$composer->getInstallationManager()->addInstaller($installer);
 		$this->composer = $composer;
@@ -37,7 +37,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$io = $event->getIO();
 		$locker = $composer->getLocker();
 
-		$io->write('<info>Test: postAutoloadDump</info>');
+		$io->write('<info>BORS© update process</info>');
 
 		$lock_data = $locker->getLockData();
 		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
