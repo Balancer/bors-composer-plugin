@@ -26,6 +26,7 @@ class Plugin implements PluginInterface
 
 	public static function getSubscribedEvents()
 	{
+		echo "plugin: getSubscribedEvents\n";
 		return array(
 			PluginEvents::POST_AUTOLOAD_DUMP => array(
 				array('onPostAutoloadDump1', 10),
