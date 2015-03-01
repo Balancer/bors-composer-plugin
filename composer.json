@@ -12,8 +12,10 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 
-	"psr-0": {
-		"B2Composer": "src/"
+    "autoload": {
+		"psr-0": {
+			"B2Composer": "src/"
+		}
 	},
 
 	"extra": {
