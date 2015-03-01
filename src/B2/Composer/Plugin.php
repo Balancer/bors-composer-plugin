@@ -7,6 +7,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
+use Composer\Plugin\ScriptEvents;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
@@ -28,15 +29,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		echo "plugin: getSubscribedEvents\n";
-		return array();
-/*
-			PluginEvents::POST_AUTOLOAD_DUMP => array(
+		return array(
+			ScryptEvents::POST_AUTOLOAD_DUMP => array(
 				array('onPostAutoloadDump1', 10),
 				array('onPostAutoloadDump', 0),
 				array('onPostAutoloadDump3', 30)
 			),
 		);
-*/
 	}
 
 	public static function postAutoloadDump(Event $event)
