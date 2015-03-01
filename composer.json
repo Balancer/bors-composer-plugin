@@ -17,6 +17,6 @@
 	},
 
 	"extra": {
-		"class": "B2\Composer\\Plugin"
+		"class": "B2\\Composer\\Plugin"
 	}
 }
