@@ -30,7 +30,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	{
 		echo "plugin: getSubscribedEvents\n";
 		return array(
-			ScryptEvents::POST_AUTOLOAD_DUMP => array(
+			ScriptEvents::POST_AUTOLOAD_DUMP => array(
 				array('onPostAutoloadDump1', 10),
 				array('onPostAutoloadDump', 0),
 				array('onPostAutoloadDump3', 30)
