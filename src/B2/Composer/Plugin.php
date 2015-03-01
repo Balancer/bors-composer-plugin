@@ -51,7 +51,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 					if(is_callable($callback))
 						call_user_func($callback, $data, $package, $composer);
 					else
-						$io->write('<error>Incorrect callback'.print_r($callback, true).'</error>');
+						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
 			}
 		}
 	}
