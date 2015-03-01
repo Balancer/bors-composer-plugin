@@ -25,7 +25,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$this->io = $io;
 	}
 
-	public static function getSubscribedEvents()
+	public static function getSubscribedEvents1()
 	{
 		echo "plugin: getSubscribedEvents\n";
 		return array(
