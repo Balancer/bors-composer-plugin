@@ -1,6 +1,6 @@
 {
     "name": "balancer/b2-composer-plugin",
-    "type": "composer-plugin",
+    "type": "composer-installer",
     "license": "GPL-3.0",
     "authors": [
         {
@@ -19,6 +19,6 @@
 	},
 
 	"extra": {
-		"class": "B2\\Composer\\Plugin"
+		"class": "B2\\Composer\\Installer"
 	}
 }
