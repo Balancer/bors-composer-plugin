@@ -35,9 +35,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
+		$locker = $composer->getLocker();
+
 		$io->write('<info>Test: postAutoloadDump</info>');
-		echo "args="; print_r($event->getArguments());
-		echo "flags="; print_r($event->getFlags());
-		echo "name="; print_r($event->getName());
+
+		$lock_data = $locker->getLockData();
+		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
+
+		foreach($all_packages as $package)
+		{
+			$extra = isset($package['extra']) ? $package['extra'] : array();
+			if(isset($extra['bors-calls']))
+			{
+				foreach($extra['bors-calls'] as $callback => $data)
+					var_dump($callback, $data);
+			}
+		}
 	}
 }
