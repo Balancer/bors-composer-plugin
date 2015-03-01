@@ -21,7 +21,7 @@ class Plugin implements PluginInterface
         $io->write('<info>Test: postAutoloadDump</info>');
 	}
 
-public function activate(Composer $composer, IOInterface $io)
+	public function activate0(Composer $composer, IOInterface $io)
     {
     	echo "activate plugin\n";
 //        $installer = new TemplateInstaller($io, $composer);
