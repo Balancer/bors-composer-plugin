@@ -19,7 +19,7 @@ class Plugin implements Composer\Plugin\PluginInterface
 
 public function activate(Composer $composer, IOInterface $io)
     {
-    	echo "activate\n";
+    	echo "activate plugin\n";
 //        $installer = new TemplateInstaller($io, $composer);
 //        $composer->getInstallationManager()->addInstaller($installer);
     }
