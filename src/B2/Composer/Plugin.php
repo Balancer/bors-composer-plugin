@@ -12,12 +12,6 @@ use Composer\Script\ScriptEvents;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
-	public function supports($packageType)
-	{
-		echo "test plugin support '$packageType'\n";
-		return 'bors-component' === $packageType;
-	}
-
 	public function activate(Composer $composer, IOInterface $io)
 	{
 		echo "activate plugin\n";
@@ -29,35 +23,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 	public static function getSubscribedEvents()
 	{
-		echo "plugin: getSubscribedEvents\n";
+//		echo "plugin: getSubscribedEvents\n";
 		return array(
 			ScriptEvents::POST_AUTOLOAD_DUMP => array(
-				array('postAutoloadDump1', 0),
-				array('postAutoloadDump', 0),
-				array('postAutoloadDump3', 30)
+				array('postAutoloadDump', 0), // Приоритет, чем выше, тем раньше вызывается.
 			),
 		);
 	}
 
 	public static function postAutoloadDump(CommandEvent $event)
 	{
-		echo "postAutoloadDump\n";
 		$composer = $event->getComposer();
 		$io = $event->getIO();
 		$io->write('<info>Test: postAutoloadDump</info>');
-	}
-
-	public static function postAutoloadDump1(CommandEvent $event)
-	{
-		$composer = $event->getComposer();
-		$io = $event->getIO();
-		$io->write('<info>Test: postAutoloadDump1</info>');
-	}
-
-	public static function postAutoloadDump3(CommandEvent $event)
-	{
-		$composer = $event->getComposer();
-		$io = $event->getIO();
-		$io->write('<info>Test: postAutoloadDump3</info>');
 	}
 }
