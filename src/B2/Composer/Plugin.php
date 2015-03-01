@@ -30,11 +30,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	{
 		echo "plugin: getSubscribedEvents\n";
 		return array(
-//			ScriptEvents::POST_AUTOLOAD_DUMP => array(
-//			array('onPostAutoloadDump1', 10),
-//				array('onPostAutoloadDump', 0),
-//				array('onPostAutoloadDump3', 30)
-//			),
+			ScriptEvents::POST_AUTOLOAD_DUMP => array(
+				array('onPostAutoloadDump1', 10),
+				array('onPostAutoloadDump', 0),
+				array('onPostAutoloadDump3', 30)
+			),
 		);
 	}
 
@@ -49,13 +49,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
-		$io->write('<info>Test: postAutoloadDump</info>');
+		$io->write('<info>Test: postAutoloadDump1</info>');
 	}
 
 	public static function postAutoloadDump3(Event $event)
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
-		$io->write('<info>Test: postAutoloadDump</info>');
+		$io->write('<info>Test: postAutoloadDump3</info>');
 	}
 }
