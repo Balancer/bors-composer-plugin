@@ -33,7 +33,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		return array(
 			ScriptEvents::POST_AUTOLOAD_DUMP => array(
 //				array('onPostAutoloadDump1', 0),
-				'postAutoloadDump'
+				array('postAutoloadDump', 0),
 //				array('onPostAutoloadDump3', 30)
 			),
 		);
