@@ -12,11 +12,11 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 
-    "require": {
-		"balancer/b2-framework": "*"
-    },
+        "psr-0": {
+            "B2\\Composer": "src/"
+        }
 
 	"extra": {
-		"class": "b2f_composer_plugin"
+		"class": "B2\Composer\\Plugin"
 	}
 }
