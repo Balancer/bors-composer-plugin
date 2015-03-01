@@ -12,11 +12,11 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 
-    "autoload": {
-		"classmap": ["classes/"]
+    "require": {
+		"balancer/b2-framework": "*"
     },
 
 	"extra": {
-		"class": "b2_composer"
+		"class": "b2f_composer_plugin"
 	}
 }
