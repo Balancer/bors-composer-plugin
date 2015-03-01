@@ -7,6 +7,7 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\CommandEvent;
 use Composer\Script\ScriptEvents;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
@@ -38,21 +39,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		);
 	}
 
-	public static function postAutoloadDump(Event $event)
+	public static function postAutoloadDump(CommandEvent $event)
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
 		$io->write('<info>Test: postAutoloadDump</info>');
 	}
 
-	public static function postAutoloadDump1(Event $event)
+	public static function postAutoloadDump1(CommandEvent $event)
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
 		$io->write('<info>Test: postAutoloadDump1</info>');
 	}
 
-	public static function postAutoloadDump3(Event $event)
+	public static function postAutoloadDump3(CommandEvent $event)
 	{
 		$composer = $event->getComposer();
 		$io = $event->getIO();
