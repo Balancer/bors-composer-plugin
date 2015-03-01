@@ -25,16 +25,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$this->io = $io;
 	}
 
-	public static function getSubscribedEvents1()
+	public static function getSubscribedEvents()
 	{
 		echo "plugin: getSubscribedEvents\n";
-		return array(
+		return array();
+/*
 			PluginEvents::POST_AUTOLOAD_DUMP => array(
 				array('onPostAutoloadDump1', 10),
 				array('onPostAutoloadDump', 0),
 				array('onPostAutoloadDump3', 30)
 			),
 		);
+*/
 	}
 
 	public static function postAutoloadDump(Event $event)
