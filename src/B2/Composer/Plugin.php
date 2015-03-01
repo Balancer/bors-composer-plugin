@@ -29,7 +29,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 	public static function getSubscribedEvents()
 	{
-		$ev = parent::getSubscribedEvents();
 		echo "plugin: getSubscribedEvents\n";
 		return array(
 //			ScriptEvents::POST_AUTOLOAD_DUMP => array(
