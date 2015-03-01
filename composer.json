@@ -12,9 +12,9 @@
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 
-        "psr-0": {
-            "B2\\Composer": "src/"
-        }
+	"psr-0": {
+		"B2\\Composer": "src/"
+	},
 
 	"extra": {
 		"class": "B2\Composer\\Plugin"
