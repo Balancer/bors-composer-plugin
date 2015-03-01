@@ -1,6 +1,6 @@
 <?php
 
-namespace B2Composer;
+namespace B2\Composer;
 
 use Composer\Installer\LibraryInstaller;
 
