@@ -48,7 +48,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			if(isset($extra['bors-calls']))
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
-					var_dump($callback, $data);
+					call_user_func($callback, $data, $package, $composer);
 			}
 		}
 	}
