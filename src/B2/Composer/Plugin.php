@@ -37,5 +37,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$io = $event->getIO();
 		$io->write('<info>Test: postAutoloadDump</info>');
 		echo "args="; print_r($event->getArguments());
+		echo "flags="; print_r($event->getFlags());
+		echo "name="; print_r($event->getName());
 	}
 }
