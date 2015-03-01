@@ -1,0 +1,21 @@
+{
+    "name": "balancer/b2-composer-plugin",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Balancer",
+            "email": "balancer@balancer.ru"
+        }
+    ],
+
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+
+    "autoload": {
+		"classmap": ["classes/"]
+    },
+
+	"extra": {
+		"class": "b2_composer"
+	}
+}
