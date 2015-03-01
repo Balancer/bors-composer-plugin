@@ -2,7 +2,9 @@
 
 namespace B2\Composer;
 
-class Plugin implements Composer\Plugin\PluginInterface
+use Composer\Plugin\PluginInterface;
+
+class Plugin implements PluginInterface
 {
 	public function supports($packageType)
 	{
