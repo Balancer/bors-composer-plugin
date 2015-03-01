@@ -2,7 +2,9 @@
 
 namespace B2Composer;
 
-class Plugin extends Composer\Installer\LibraryInstaller
+use Composer\Installer\LibraryInstaller;
+
+class Plugin extends LibraryInstaller
 {
 	public function supports($packageType)
 	{
