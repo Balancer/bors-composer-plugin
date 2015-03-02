@@ -19,6 +19,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 //		$composer->getInstallationManager()->addInstaller($installer);
 		$this->composer = $composer;
 		$this->io = $io;
+
+		var_dump($composer);
+
+//		if(empty($GLOBALS['bors.composer.class_loader']))
+//			$GLOBALS['bors.composer.class_loader'] = $composer;
+
+//		if(!defined('COMPOSER_ROOT'))
+//			define('COMPOSER_ROOT', dirname($composer->getVendorDir()));
 	}
 
 	public static function getSubscribedEvents()
@@ -53,7 +61,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 //						$callback = array($m[1], $m[2]);
 
 					if(is_callable($callback))
-						call_user_func($callback, $data, $package, $composer);
+						call_user_func($callback, $data, $composer, $package);
 					else
 						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
 				}
