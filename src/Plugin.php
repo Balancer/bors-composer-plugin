@@ -49,10 +49,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
 				{
-					if(is_callable($callback))
-						call_user_func($callback, $data, $composer, $package);
-					else
-						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
+//					if(is_callable($callback))
+						call_user_func("\\".$callback, $data, $composer, $package);
+//					else
+//						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
 				}
 			}
 		}
