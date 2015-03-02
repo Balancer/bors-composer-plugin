@@ -42,6 +42,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$lock_data = $locker->getLockData();
 		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
 
+		\B2\Router\Fastroute::adds(['qqq www eee']);
+
 		foreach($all_packages as $package)
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
@@ -49,8 +51,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
 				{
+					if(preg_match('/^(.+)::(\w+)$/', $callback, $m))
+						$callback = array("\\".$m[1], $m[2]);
+
 //					if(is_callable($callback))
-						call_user_func("\\".$callback, $data, $composer, $package);
+						call_user_func($callback, $data, $composer, $package);
 //					else
 //						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
 				}
