@@ -52,7 +52,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				foreach($extra['bors-calls'] as $callback => $data)
 				{
 					if(preg_match('/^(.+)::(\w+)$/', $callback, $m))
-						$callback = array("\\".$m[1], $m[2]);
+						$callback = array($m[1], $m[2]);
 
 //					if(is_callable($callback))
 						call_user_func($callback, $data, $composer, $package);
