@@ -13,8 +13,8 @@
 	"minimum-stability": "dev",
 
     "autoload": {
-		"psr-0": {
-			"B2\\Composer\\": "./"
+		"psr-4": {
+			"B2\\Composer": "./"
 		}
 	},
 
