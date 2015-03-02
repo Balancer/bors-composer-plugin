@@ -14,24 +14,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 {
 	public function activate(Composer $composer, IOInterface $io)
 	{
-//		echo "activate plugin\n";
-//		$installer = new TemplateInstaller($io, $composer);
-//		$composer->getInstallationManager()->addInstaller($installer);
 		$this->composer = $composer;
 		$this->io = $io;
 
-		var_dump($composer);
-
-//		if(empty($GLOBALS['bors.composer.class_loader']))
-//			$GLOBALS['bors.composer.class_loader'] = $composer;
-
-//		if(!defined('COMPOSER_ROOT'))
-//			define('COMPOSER_ROOT', dirname($composer->getVendorDir()));
+		if(!defined('COMPOSER_ROOT'))
+			// Ад. Но сходу не нашёл, как получить baseDir в Composer.
+			define('COMPOSER_ROOT', dirname(dirname(dirname(dirname(dirname(dirname(__DIR__)))))));
 	}
 
 	public static function getSubscribedEvents()
 	{
-//		echo "plugin: getSubscribedEvents\n";
 		return array(
 			ScriptEvents::POST_AUTOLOAD_DUMP => array(
 				array('postAutoloadDump', 0), // Приоритет, чем выше, тем раньше вызывается.
@@ -57,9 +49,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
 				{
-//					if(preg_match('/^(\w+)::(\w+)$/', $callback, $m))
-//						$callback = array($m[1], $m[2]);
-
 					if(is_callable($callback))
 						call_user_func($callback, $data, $composer, $package);
 					else
