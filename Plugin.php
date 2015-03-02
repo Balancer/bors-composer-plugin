@@ -19,7 +19,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		if(!defined('COMPOSER_ROOT'))
 			// Ад. Но сходу не нашёл, как получить baseDir в Composer.
-			define('COMPOSER_ROOT', dirname(dirname(dirname(dirname(dirname(__DIR__))))));
+			define('COMPOSER_ROOT', dirname(dirname(dirname(__DIR__))));
 	}
 
 	public static function getSubscribedEvents()
