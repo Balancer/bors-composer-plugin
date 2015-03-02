@@ -42,7 +42,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$lock_data = $locker->getLockData();
 		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
 
-		\B2\Router\Fastroute::adds(['qqq www eee']);
+//		\B2\Router\Fastroute::adds(['qqq www eee']);
 
 		foreach($all_packages as $package)
 		{
