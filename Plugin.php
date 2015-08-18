@@ -42,8 +42,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$lock_data = $locker->getLockData();
 		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
 
-		// Иначе новые классы не хотят грузиться :-/
-		require __DIR__.'/../../autoload.php';
+		// Проверяем на наличие autoload.php, а то можем грузиться из .phar
+		if(file_exists($d = __DIR__.'/../../autoload.php'))
+			// Иначе новые классы не хотят грузиться :-/
+			require $d;
 
 		foreach($all_packages as $package)
 		{
