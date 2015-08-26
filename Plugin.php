@@ -50,6 +50,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		foreach($all_packages as $package)
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
+
 			if(isset($extra['bors-calls']))
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
@@ -60,6 +61,25 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 						$io->write('<error>Incorrect callback: '.print_r($callback, true).'</error>');
 				}
 			}
+
+			if(!empty($extra['bors-classes']))
+			{
+				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-classes'];
+				\B2\Composer\Cache::appendData('config/dirs/classes', "'$class_path'");
+//				$io->write('<info>Bors classes in: '.print_r($package, true).'</info>');
+//				$io->write("<info>Bors classes in: {$class_path}</info>");
+			}
+
+			if(!empty($extra['bors-templates']))
+			{
+				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-templates'];
+				\B2\Composer\Cache::appendData('config/dirs/templates', "'$class_path'");
+			}
 		}
+
+		$code = "bors::\$composer_class_dirs = array(".join(', ', array_unique(\B2\Composer\Cache::getData('config/dirs/classes'))).");\n";
+		$code .= "bors::\$composer_template_dirs = array(".join(', ', array_unique(\B2\Composer\Cache::getData('config/dirs/templates'))).");\n";
+
+		\B2\Composer\Cache::addAutoload('config/dirs', $code);
 	}
 }
