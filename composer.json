@@ -9,6 +9,10 @@
         }
     ],
 
+	"support": {
+		"source": "https://github.com/Balancer/bors-composer-plugin"
+	},
+
 	"prefer-stable": true,
 	"minimum-stability": "dev",
 
