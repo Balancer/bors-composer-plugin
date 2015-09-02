@@ -23,7 +23,7 @@
 	},
 
 	"require": {
-		"bors/composer": "*",
+		"bors/composer-driver": "*",
 		"composer-plugin-api": "*"
 	}
 }
