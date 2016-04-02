@@ -78,7 +78,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 			if(!empty($extra['bors-smarty-plugins']))
 			{
-				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-templates'];
+				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-smarty-plugins'];
 				\B2\Composer\Cache::appendData('config/dirs/smarty-plugins', "'$class_path'");
 			}
 		}
