@@ -75,10 +75,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-templates'];
 				\B2\Composer\Cache::appendData('config/dirs/templates', "'$class_path'");
 			}
+
+			if(!empty($extra['bors-smarty-plugins']))
+			{
+				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-templates'];
+				\B2\Composer\Cache::appendData('config/dirs/smarty-plugins', "'$class_path'");
+			}
 		}
 
 		$code = "bors::\$composer_class_dirs = array(".join(', ', array_unique(\B2\Composer\Cache::getData('config/dirs/classes'))).");\n";
 		$code .= "bors::\$composer_template_dirs = array(".join(', ', array_unique(\B2\Composer\Cache::getData('config/dirs/templates'))).");\n";
+		$code .= "bors::\$composer_smarty_plugin_dirs = array(".join(', ', array_unique(\B2\Composer\Cache::getData('config/dirs/smarty-plugins'))).");\n";
 
 		\B2\Composer\Cache::addAutoload('config/dirs', $code);
 	}
