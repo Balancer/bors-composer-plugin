@@ -51,6 +51,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
 
+			$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
+
 			if(isset($extra['bors-calls']))
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
@@ -62,31 +64,33 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				}
 			}
 
-			if(!empty($extra['bors-classes']))
-			{
-				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-classes'];
-				\B2\Composer\Cache::appendData('config/dirs/classes', "'$class_path'");
-//				$io->write('<info>Bors classes in: '.print_r($package, true).'</info>');
-//				$io->write("<info>Bors classes in: {$class_path}</info>");
-			}
-
-			if(!empty($extra['bors-templates']))
-			{
-				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-templates'];
-				\B2\Composer\Cache::appendData('config/dirs/templates', "'$class_path'");
-			}
-
-			if(!empty($extra['bors-smarty-plugins']))
-			{
-				$class_path = COMPOSER_ROOT. '/vendor/' . $package['name'] . '/' . $extra['bors-smarty-plugins'];
-				\B2\Composer\Cache::appendData('config/dirs/smarty-plugins', "'$class_path'");
-			}
+			self::append_extra($package_path, $extra, 'classes');
+			self::append_extra($package_path, $extra, 'route-maps');
+			self::append_extra($package_path, $extra, 'templates');
+			self::append_extra($package_path, $extra, 'smarty-plugins');
 		}
 
-		$code = "bors::\$composer_class_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/classes')))."];\n";
-		$code .= "bors::\$composer_template_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/templates')))."];\n";
-		$code .= "bors::\$composer_smarty_plugin_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/smarty-plugins')))."];\n";
+		$code = "bors::\$composer_class_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/classes', [])))."];\n";
+		$code .= "bors::\$composer_template_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/templates', [])))."];\n";
+		$code .= "bors::\$composer_smarty_plugin_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/smarty-plugins', [])))."];\n";
+		$code .= "bors::\$composer_route_maps= [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-maps', [])))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/dirs', $code);
+	}
+
+	static function append_extra($package_path, $extra, $name)
+	{
+		if(empty($extra['bors-'.$name]))
+			return;
+
+		$dirs = $extra['bors-'.$name];
+		if(!is_array($dirs))
+		{
+			\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$package_path/$dirs'");
+			return;
+		}
+
+		foreach($dirs as $x)
+			\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$package_path/$x'");
 	}
 }
