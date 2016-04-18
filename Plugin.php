@@ -68,12 +68,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'route-maps');
 			self::append_extra($package_path, $extra, 'templates');
 			self::append_extra($package_path, $extra, 'smarty-plugins');
+			self::append_extra($package_path, $extra, 'autoroute-prefixes');
 		}
 
 		$code = "bors::\$composer_class_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/classes', [])))."];\n";
 		$code .= "bors::\$composer_template_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/templates', [])))."];\n";
 		$code .= "bors::\$composer_smarty_plugin_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/smarty-plugins', [])))."];\n";
-		$code .= "bors::\$composer_route_maps= [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-maps', [])))."];\n";
+		$code .= "bors::\$composer_route_maps = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-maps', [])))."];\n";
+		$code .= "bors::\$composer_autoroute_prefixes = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/autoroute-prefixes', [])))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/dirs', $code);
 	}
