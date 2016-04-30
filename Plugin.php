@@ -71,7 +71,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'autoroute-prefixes');
 		}
 
-		$code = "bors::\$composer_class_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/classes', [])))."];\n";
+		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
+
+		$code .= "bors::\$composer_class_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/classes', [])))."];\n";
 		$code .= "bors::\$composer_template_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/templates', [])))."];\n";
 		$code .= "bors::\$composer_smarty_plugin_dirs = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/smarty-plugins', [])))."];\n";
 		$code .= "bors::\$composer_route_maps = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-maps', [])))."];\n";
@@ -82,17 +84,19 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 	static function append_extra($package_path, $extra, $name)
 	{
+		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
+
 		if(empty($extra['bors-'.$name]))
 			return;
 
 		$dirs = $extra['bors-'.$name];
 		if(!is_array($dirs))
 		{
-			\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$package_path/$dirs'");
+			\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$dirs'");
 			return;
 		}
 
 		foreach($dirs as $x)
-			\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$package_path/$x'");
+			\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$x'");
 	}
 }
