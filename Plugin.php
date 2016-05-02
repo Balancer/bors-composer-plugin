@@ -76,6 +76,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				\B2\Composer\Cache::appendData('config/packages/path', [ $package['name'] => $package_path]);
 				\B2\Composer\Cache::appendData('config/packages/names', [ $extra['bors-app'] => $package['name']]);
 				\B2\Composer\Cache::appendData('config/packages/app-path', [ $extra['bors-app'] => $package_path]);
+
+				if(!empty($extra['bors-routers']))
+					\B2\Composer\Cache::appendData('config/apps/routers',  [ $package['bors-app'] => $extra['bors-routers']]);
 			}
 		}
 
@@ -107,6 +110,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "\nbors::\$package_app_path = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/app-path', []) as $app => $path)
 			$code .= "\t'".addslashes($app)."' => '".addslashes($path)."',\n";
+		$code .= "];\n";
+
+		\B2\Composer\Cache::addAutoload('config/packages', $code);
+
+		$code = "bors::\$app_routers = [\n";
+		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
+			$code .= "\t'$app' => ".var_export($app).",\n";
 		$code .= "];\n";
 
 		\B2\Composer\Cache::addAutoload('config/packages', $code);
