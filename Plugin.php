@@ -71,14 +71,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'autoroute-prefixes');
 
 			if(!empty($extra['bors-app']))
-				\B2\Composer\Cache::appendData('config/packages/apps', [ $package['name'] => $extra['bors-app']]);
-
-			if(!empty($extra['bors-app'])
-//				|| !empty($extra['bors-classes']) || !empty($extra['bors-route-maps'])
-//				|| !empty($extra['bors-templates']) || !empty($extra['bors-smarty-plugins'])
-			)
 			{
+				\B2\Composer\Cache::appendData('config/packages/apps',  [ $package['name'] => $extra['bors-app']]);
 				\B2\Composer\Cache::appendData('config/packages/path', [ $package['name'] => $package_path]);
+				\B2\Composer\Cache::appendData('config/packages/names', [ $extra['bors-app'] => $package['name']]);
+				\B2\Composer\Cache::appendData('config/packages/app-path', [ $extra['bors-app'] => $package_path]);
 			}
 		}
 
@@ -100,6 +97,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "\nbors::\$package_path = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/path', []) as $pkg => $path)
 			$code .= "\t'$pkg' => '".addslashes($path)."',\n";
+		$code .= "];\n";
+
+		$code .= "\nbors::\$package_names = [\n";
+		foreach(\B2\Composer\Cache::getData('config/packages/names', []) as $app => $pkg)
+			$code .= "\t'".addslashes($app)."' => '".addslashes($pkg)."',\n";
+		$code .= "];\n";
+
+		$code .= "\nbors::\$package_app_path = [\n";
+		foreach(\B2\Composer\Cache::getData('config/packages/app-path', []) as $app => $path)
+			$code .= "\t'".addslashes($app)."' => '".addslashes($path)."',\n";
 		$code .= "];\n";
 
 		\B2\Composer\Cache::addAutoload('config/packages', $code);
