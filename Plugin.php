@@ -69,6 +69,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'templates');
 			self::append_extra($package_path, $extra, 'smarty-plugins');
 			self::append_extra($package_path, $extra, 'autoroute-prefixes');
+
+			if(!empty($extra['bors-app']))
+				\B2\Composer\Cache::appendData('config/packages/apps', [ $package['name'] => $extra['bors-app']]);
 		}
 
 		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
@@ -80,6 +83,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_autoroute_prefixes = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/autoroute-prefixes', [])))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/dirs', $code);
+
+		$code = "bors::\$package_apps = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/packages/apps', [])))."];\n";
+		\B2\Composer\Cache::addAutoload('config/package-apps', $code);
 	}
 
 	static function append_extra($package_path, $extra, $name)
