@@ -78,7 +78,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				\B2\Composer\Cache::appendData('config/packages/app-path', [ $extra['bors-app'] => $package_path]);
 
 				if(!empty($extra['bors-routers']))
-					\B2\Composer\Cache::appendData('config/apps/routers',  [ $package['bors-app'] => $extra['bors-routers']]);
+					\B2\Composer\Cache::appendData('config/apps/routers',  [ $extra['bors-app'] => $extra['bors-routers']]);
 			}
 		}
 
