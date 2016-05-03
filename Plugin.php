@@ -116,7 +116,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		$code = "bors::\$app_routers = [\n";
 		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
-			$code .= "\t'$app' => ".var_export($app).",\n";
+			$code .= "\t'$pkg' => ".var_export($routers, true).",\n";
 		$code .= "];\n";
 
 		\B2\Composer\Cache::addAutoload('config/packages', $code);
