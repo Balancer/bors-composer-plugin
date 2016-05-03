@@ -102,6 +102,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			$code .= "\t'$pkg' => '".addslashes($path)."',\n";
 		$code .= "];\n";
 
+		\B2\Composer\Cache::addAutoload('config/packages', $code);
+
+		$code = "bors::\$app_routers = [\n";
+		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
+			$code .= "\t'$pkg' => ".var_export($routers, true).",\n";
+		$code .= "];\n";
+
 		$code .= "\nbors::\$package_names = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/names', []) as $app => $pkg)
 			$code .= "\t'".addslashes($app)."' => '".addslashes($pkg)."',\n";
@@ -112,14 +119,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			$code .= "\t'".addslashes($app)."' => '".addslashes($path)."',\n";
 		$code .= "];\n";
 
-		\B2\Composer\Cache::addAutoload('config/packages', $code);
-
-		$code = "bors::\$app_routers = [\n";
-		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
-			$code .= "\t'$pkg' => ".var_export($routers, true).",\n";
-		$code .= "];\n";
-
-		\B2\Composer\Cache::addAutoload('config/packages', $code);
+		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
 
 	static function append_extra($package_path, $extra, $name)
