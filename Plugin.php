@@ -40,7 +40,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$io->write('<info>BORS© update process</info>');
 
 		$lock_data = $locker->getLockData();
-		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : array();
+		$all_packages = isset($lock_data['packages']) ? $lock_data['packages'] : [];
+
+		$all_packages[] = json_decode(file_get_contents(COMPOSER_ROOT.'/composer.json'), true);
 
 		// Проверяем на наличие autoload.php, а то можем грузиться из .phar
 		if(file_exists($d = __DIR__.'/../../autoload.php'))
@@ -51,7 +53,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
 
-			$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
+			// So detecting root package, not in vendor dir.
+			if(empty($package['notification-url']))
+				$package_path = COMPOSER_ROOT;
+			else
+				$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
 
 			if(isset($extra['bors-calls']))
 			{
@@ -92,19 +98,23 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		\B2\Composer\Cache::addAutoload('config/dirs', $code);
 
-		$code = "bors::\$package_apps = [\n";
+		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
+
+		$code .= "bors::\$package_apps = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/apps', []) as $pkg => $app)
 			$code .= "\t'$pkg' => '".addslashes($app)."',\n";
 		$code .= "];\n";
 
 		$code .= "\nbors::\$package_path = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/path', []) as $pkg => $path)
-			$code .= "\t'$pkg' => '".addslashes($path)."',\n";
+			$code .= "\t'$pkg' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
 		\B2\Composer\Cache::addAutoload('config/packages', $code);
 
-		$code = "bors::\$app_routers = [\n";
+		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
+
+		$code .= "bors::\$app_routers = [\n";
 		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
 			$code .= "\t'$pkg' => ".var_export($routers, true).",\n";
 		$code .= "];\n";
@@ -116,10 +126,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		$code .= "\nbors::\$package_app_path = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/app-path', []) as $app => $path)
-			$code .= "\t'".addslashes($app)."' => '".addslashes($path)."',\n";
+			$code .= "\t'".addslashes($app)."' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
+	}
+
+	static function make_path($path)
+	{
+		$path = str_replace(dirname(dirname(dirname(__DIR__))), '', $path);
+		return $path ? "COMPOSER_ROOT.'".addslashes($path)."'" : 'COMPOSER_ROOT';
 	}
 
 	static function append_extra($package_path, $extra, $name)
