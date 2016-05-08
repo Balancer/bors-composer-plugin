@@ -53,11 +53,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
 
-			// So detecting root package, not in vendor dir.
-			if(empty($package['notification-url']))
-				$package_path = COMPOSER_ROOT;
-			else
+			if(!empty($package['name']))
+			{
 				$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
+				// So detecting root package, not in vendor dir.
+				if(!file_exists($package_path.'/composer.json'))
+					$package_path = COMPOSER_ROOT;
+			}
+			else
+				$package_path = COMPOSER_ROOT;
 
 			if(isset($extra['bors-calls']))
 			{
