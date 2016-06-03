@@ -78,7 +78,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'route-maps');
 			self::append_extra($package_path, $extra, 'templates');
 			self::append_extra($package_path, $extra, 'smarty-plugins');
-			self::append_extra($package_path, $extra, 'autoroute-prefixes');
+			self::append_extra($package_path, $extra, 'autoroute-prefixes', false);
 
 			if(!empty($extra['bors-app']))
 			{
@@ -142,7 +142,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		return $path ? "COMPOSER_ROOT.'".addslashes($path)."'" : 'COMPOSER_ROOT';
 	}
 
-	static function append_extra($package_path, $extra, $name)
+	static function append_extra($package_path, $extra, $name, $with_path = true)
 	{
 		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
 
@@ -150,13 +150,26 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			return;
 
 		$dirs = $extra['bors-'.$name];
-		if(!is_array($dirs))
-		{
-			\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$dirs'");
-			return;
-		}
 
-		foreach($dirs as $x)
-			\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$x'");
+		if($with_path)
+		{
+			if(is_array($dirs))
+			{
+				foreach($dirs as $x)
+					\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$x'");
+			}
+			else
+				\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$dirs'");
+		}
+		else
+		{
+			if(is_array($dirs))
+			{
+				foreach($dirs as $x)
+					\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$x'");
+			}
+			else
+				\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$dirs'");
+		}
 	}
 }
