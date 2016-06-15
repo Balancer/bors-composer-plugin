@@ -117,7 +117,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
 
-		$code .= "bors::\$composer_autoroute_prefixes = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/autoroute-prefixes', [])))."];\n";
+		$code .= "bors::\$composer_autoroute_prefixes = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/autoroute-prefixes', [])))."];\n\n";
 
 		$code .= "bors::\$app_routers = [\n";
 		foreach(\B2\Composer\Cache::getData('config/apps/routers', []) as $pkg => $routers)
