@@ -154,6 +154,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		if($with_path)
 		{
+			//WTF? Where now /vendor prefix in path? o_O
+			if(!preg_match('!/vendor/!', $package_path))
+				$package_path = '/vendor'.$package_path;
+
 			if(is_array($dirs))
 			{
 				foreach($dirs as $x)
