@@ -91,6 +91,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				if(!empty($extra['bors-routers']))
 					\B2\Composer\Cache::appendData('config/apps/routers',  [ $extra['bors-app'] => $extra['bors-routers']]);
 			}
+
+			if(!empty($extra['bors-route-map']))
+				\B2\Composer\Cache::appendData('config/packages/route-maps', [ $package['name'] => $extra['bors-route-map']]);
 		}
 
 		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
@@ -108,6 +111,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$package_apps = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/apps', []) as $pkg => $app)
 			$code .= "\t'$pkg' => '".addslashes($app)."',\n";
+		$code .= "];\n";
+
+		$code .= "bors::\$package_route_maps = [\n";
+		foreach(\B2\Composer\Cache::getData('config/packages/route-maps', []) as $pkg => $route_map)
+			$code .= "\t'$pkg' => ".var_export($route_maps, true).",\n";
 		$code .= "];\n";
 
 		$code .= "\nbors::\$package_path = [\n";
