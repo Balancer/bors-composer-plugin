@@ -93,7 +93,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			}
 
 			if(!empty($extra['bors-route-map']))
-				\B2\Composer\Cache::appendData('config/packages/route-maps', [ $package['name'] => $extra['bors-route-map']]);
+				self::append_extra($package_path, $extra, 'route-map', true, 'packages', $package['name']);
+//				\B2\Composer\Cache::appendData('config/packages/route-map', [ $package['name'] => $extra['bors-route-map']]);
 		}
 
 		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
@@ -114,8 +115,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "];\n";
 
 		$code .= "bors::\$package_route_maps = [\n";
-		foreach(\B2\Composer\Cache::getData('config/packages/route-maps', []) as $pkg => $route_map)
-			$code .= "\t'$pkg' => ".var_export($route_maps, true).",\n";
+		foreach(\B2\Composer\Cache::getData('config/packages/route-map', []) as $pkg => $route_map)
+			$code .= "\t'$pkg' => ".$route_map.",\n";
 		$code .= "];\n";
 
 		$code .= "\nbors::\$package_path = [\n";
@@ -153,7 +154,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		return $path ? "COMPOSER_ROOT.'".addslashes($path)."'" : 'COMPOSER_ROOT';
 	}
 
-	static function append_extra($package_path, $extra, $name, $with_path = true)
+	static function append_extra($package_path, $extra, $name, $with_path = true, $type='dirs', $package_name = NULL)
 	{
 		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
 
@@ -161,6 +162,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			return;
 
 		$dirs = $extra['bors-'.$name];
+
+		$param_name = 'config/'.$type.'/'.$name;
 
 		if($with_path)
 		{
@@ -171,20 +174,25 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			if(is_array($dirs))
 			{
 				foreach($dirs as $x)
-					\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$x'");
+					\B2\Composer\Cache::appendData($param_name, "COMPOSER_ROOT.'$package_path/$x'");
 			}
 			else
-				\B2\Composer\Cache::appendData('config/dirs/'.$name, "COMPOSER_ROOT.'$package_path/$dirs'");
+			{
+				if($package_name)
+					\B2\Composer\Cache::appendData($param_name, [$package_name => "COMPOSER_ROOT.'$package_path/$dirs'"]);
+				else
+					\B2\Composer\Cache::appendData($param_name, "COMPOSER_ROOT.'$package_path/$dirs'");
+			}
 		}
 		else
 		{
 			if(is_array($dirs))
 			{
 				foreach($dirs as $x)
-					\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$x'");
+					\B2\Composer\Cache::appendData($param_name, "'$x'");
 			}
 			else
-				\B2\Composer\Cache::appendData('config/dirs/'.$name, "'$dirs'");
+				\B2\Composer\Cache::appendData($param_name, "'$dirs'");
 		}
 	}
 }
