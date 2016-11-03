@@ -80,6 +80,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'smarty-plugins');
 			self::append_extra($package_path, $extra, 'webroot');
 			self::append_extra($package_path, $extra, 'autoroute-prefixes', false);
+			self::append_extra($package_path, $extra, 'route-static', false);
 
 			if(!empty($extra['bors-app']))
 			{
@@ -145,6 +146,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			$code .= "\t'".addslashes($app)."' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
+		$code .= "bors::\$composer_route_static = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
+
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
 
@@ -188,11 +191,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		{
 			if(is_array($dirs))
 			{
-				foreach($dirs as $x)
-					\B2\Composer\Cache::appendData($param_name, "'$x'");
+				foreach($dirs as $key => $x)
+				{
+					if(is_numeric($key))
+						\B2\Composer\Cache::appendData($param_name, "'".addslashes($x)."'");
+					else
+						\B2\Composer\Cache::appendData($param_name, "'".addslashes($key)."' => '".addslashes($x)."'");
+				}
 			}
 			else
-				\B2\Composer\Cache::appendData($param_name, "'$dirs'");
+				\B2\Composer\Cache::appendData($param_name, "'".addslashes($dirs)."'");
 		}
 	}
 }
