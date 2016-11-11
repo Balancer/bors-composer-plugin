@@ -85,6 +85,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'webroot');
 			self::append_extra($package_path, $extra, 'autoroute-prefixes', false);
 			self::append_extra($package_path, $extra, 'route-static', false);
+			self::append_extra($package_path, $extra, 'register', false);
 
 			if(!empty($extra['bors-app']))
 			{
@@ -151,6 +152,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "];\n";
 
 		$code .= "bors::\$composer_route_static = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
+		$code .= "bors::\$composer_register = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register', [])))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
