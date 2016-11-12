@@ -63,6 +63,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			else
 				$package_path = COMPOSER_ROOT;
 
+			if(isset($extra['bors-patches']))
+				foreach($extra['bors-patches'] as $patch_package_name => $patches)
+					self::doPatches($package, $patch_package_name, $patches, $io, $all_packages);
+
 			if(isset($extra['bors-calls']))
 			{
 				foreach($extra['bors-calls'] as $callback => $data)
@@ -81,6 +85,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'lcml-dir');
 			self::append_extra($package_path, $extra, 'webroot');
 			self::append_extra($package_path, $extra, 'autoroute-prefixes', false);
+			self::append_extra($package_path, $extra, 'route-static', false);
+			self::append_extra($package_path, $extra, 'register-app', false);
+			self::append_extra($package_path, $extra, 'register-view', false);
 
 			if(!empty($extra['bors-app']))
 			{
@@ -147,6 +154,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			$code .= "\t'".addslashes($app)."' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
+		$code .= "bors::\$composer_route_static     = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
+		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
+		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
+
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
 
@@ -190,11 +201,89 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		{
 			if(is_array($dirs))
 			{
-				foreach($dirs as $x)
-					\B2\Composer\Cache::appendData($param_name, "'$x'");
+				foreach($dirs as $key => $x)
+				{
+					if(is_numeric($key))
+						\B2\Composer\Cache::appendData($param_name, "'".addslashes($x)."'");
+					else
+						\B2\Composer\Cache::appendData($param_name, "'".addslashes($key)."' => '".addslashes($x)."'");
+				}
 			}
 			else
-				\B2\Composer\Cache::appendData($param_name, "'$dirs'");
+				\B2\Composer\Cache::appendData($param_name, "'".addslashes($dirs)."'");
 		}
+	}
+
+	static function doPatches($package_with_patch, $package_name, $patches, $io, $all_packages)
+	{
+		$io->write("<info>Do patches $package_name: ".print_r($patches, true).'</info>');
+
+		$package_path = NULL;
+
+		foreach($all_packages as $package)
+		{
+			if($package['name'] == $package_name)
+			{
+				$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
+				break;
+			}
+		}
+
+		if(!is_array($patches))
+			$patches = [$patches];
+
+		$executor = new \Composer\Util\ProcessExecutor($io);
+
+		foreach($patches as $title => $patch_file)
+		{
+			if(is_numeric($title))
+				$title = $patch_file;
+
+			$patch_file = COMPOSER_ROOT. '/vendor/' . $package_with_patch['name'] . DIRECTORY_SEPARATOR . $patch_file;
+
+			if(!file_exists($patch_file))
+			{
+				$io->write("<error>Can't find file path $patch_file for package $package_name</error>");
+				continue;
+			}
+
+			foreach(['-p1', '-p0', '-p2'] as $patch_level)
+			{
+				// --no-backup-if-mismatch here is a hack that fixes some
+				// differences between how patch works on windows and unix.
+				if($patched = self::executeCommand($io, "patch %s --no-backup-if-mismatch -d %s < %s", $patch_level, $package_path, $patch_file))
+		 			 break;
+			}
+	  	}
+	}
+
+	// Inspired from cweagans/composer-patches
+	static private function executeCommand($io, $cmd)
+	{
+		$executor = new \Composer\Util\ProcessExecutor($io);
+
+		// Shell-escape all arguments except the command.
+		$args = func_get_args();
+
+		foreach($args as $index => $arg)
+			if ($index > 1)
+				$args[$index] = escapeshellarg($arg);
+
+		// And replace the arguments.
+		$command = call_user_func_array('sprintf', array_slice($args, 1));
+		$output = '';
+		if($io->isVerbose())
+		{
+			$io->write('<comment>' . $command . '</comment>');
+			$output = function($type, $data) use ($io)
+			{
+				if($type == \Symfony\Component\Process\Process::ERR)
+					$io->write('<error>' . $data . '</error>');
+				else
+					$io->write('<comment>' . $data . '</comment>');
+			};
+		}
+
+		return ($executor->execute($command, $output) == 0);
 	}
 }
