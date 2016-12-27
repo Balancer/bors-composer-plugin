@@ -88,6 +88,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'route-static', false);
 			self::append_extra($package_path, $extra, 'register-app', false);
 			self::append_extra($package_path, $extra, 'register-view', false);
+			self::append_extra($package_path, $extra, 'data', false);
 
 			if(!empty($extra['bors-app']))
 			{
@@ -157,6 +158,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_route_static     = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
 		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
 		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
+		$code .= "bors::\$composer_data = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/data', []))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
