@@ -49,6 +49,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			// Иначе новые классы не хотят грузиться :-/
 			require $d;
 
+		$data_key_names = [];
+
 		foreach($all_packages as $package)
 		{
 			$extra = isset($package['extra']) ? $package['extra'] : array();
@@ -104,6 +106,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			if(!empty($extra['bors-route-map']))
 				self::append_extra($package_path, $extra, 'route-map', true, 'packages', $package['name']);
 //				\B2\Composer\Cache::appendData('config/packages/route-map', [ $package['name'] => $extra['bors-route-map']]);
+
+			foreach($extra as $key => $val)
+			{
+				if(!preg_match('/^bors-data-(.+)$/', $key, $m))
+					continue;
+
+				self::append_extra($package_path, $extra, $m[1], false);
+				$data_key_names[$m[1]] = true;
+			}
 		}
 
 		$code = "if(!defined('COMPOSER_ROOT'))\n\tdefine('COMPOSER_ROOT', dirname(dirname(__DIR__)));\n\n";
@@ -159,6 +170,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
 		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
 		$code .= "bors::\$composer_data = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/data', []))."];\n";
+
+		foreach(array_keys($data_key_names) as $name)
+		$code .= "bors::\$composer_extra_".str_replace('-', '_', $name))." = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/'.$name, []))."];\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
