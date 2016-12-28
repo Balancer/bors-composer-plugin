@@ -113,6 +113,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 					continue;
 
 				self::append_extra($package_path, $extra, $m[1], false);
+				\B2\Composer\Cache::appendData('config/data/'.$m[1], $val);
 				$data_key_names[$m[1]] = true;
 			}
 		}
@@ -172,7 +173,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_data = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/data', []))."];\n";
 
 		foreach(array_keys($data_key_names) as $name)
-		$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/'.$name, []))."];\n";
+			$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = ".var_export(\B2\Composer\Cache::getData('config/data/'.$name, []), true).";\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
