@@ -222,6 +222,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				{
 					if(is_numeric($key))
 						\B2\Composer\Cache::appendData($param_name, "'".addslashes($x)."'");
+					elseif(is_array($x))
+						\B2\Composer\Cache::appendData($param_name, "'".addslashes($key)."' => ".var_export($x, true));
 					else
 						\B2\Composer\Cache::appendData($param_name, "'".addslashes($key)."' => '".addslashes($x)."'");
 				}
