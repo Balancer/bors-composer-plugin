@@ -12,6 +12,9 @@ use Composer\Script\ScriptEvents;
 
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
+	static $bors_data = [];
+
+
 	public function activate(Composer $composer, IOInterface $io)
 	{
 		$this->composer = $composer;
@@ -90,7 +93,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'route-static', false);
 			self::append_extra($package_path, $extra, 'register-app', false);
 			self::append_extra($package_path, $extra, 'register-view', false);
-			self::append_extra($package_path, $extra, 'data', false);
+			self::append_extra_data($package_path, $extra, 'data');
 
 			if(!empty($extra['bors-app']))
 			{
@@ -170,7 +173,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_route_static     = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
 		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
 		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
-		$code .= "bors::\$composer_data = [\n\t".join(",\n\t", \B2\Composer\Cache::getData('config/dirs/data', []))."];\n";
+
+		$code .= "bors::\$composer_data = ".var_export(self::$bors_data['data'], true).";\n";
 
 		foreach(array_keys($data_key_names) as $name)
 			$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = ".var_export(\B2\Composer\Cache::getData('config/data/'.$name, []), true).";\n";
@@ -304,5 +308,38 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		}
 
 		return ($executor->execute($command, $output) == 0);
+	}
+
+	static function append_extra_data($package_path, $extra, $name)
+	{
+		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
+
+		if(empty($extra['bors-'.$name]))
+			return;
+
+		$data = $extra['bors-'.$name];
+
+		if(is_array($data))
+		{
+			foreach($data as $key => $x)
+			{
+				if(is_numeric($key))
+				{
+					self::$bors_data[$name][] = $x;
+				}
+				else
+				{
+					if(empty(self::$bors_data[$name][$key]))
+						self::$bors_data[$name][$key] = [];
+
+					if(!is_array($x))
+						$x = [$x];
+
+					self::$bors_data[$name][$key] = array_merge(self::$bors_data[$name][$key], $x);
+				}
+			}
+		}
+		else
+			self::$bors_data[$name] = array_merge(self::$bors_data[$name], [$data]);
 	}
 }
