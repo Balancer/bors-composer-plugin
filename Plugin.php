@@ -174,7 +174,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
 		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
 
-		$code .= "bors::\$composer_data = ".var_export(self::$bors_data['data'], true).";\n";
+		if(!empty(self::$bors_data['data']))
+			$code .= "bors::\$composer_data = ".var_export(self::$bors_data['data'], true).";\n";
 
 		foreach(array_keys($data_key_names) as $name)
 			$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = ".var_export(\B2\Composer\Cache::getData('config/data/'.$name, []), true).";\n";
