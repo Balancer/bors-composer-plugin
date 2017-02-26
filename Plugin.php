@@ -53,6 +53,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			require $d;
 
 		$data_key_names = [];
+		$bower_assets = [];
 
 		foreach($all_packages as $package)
 		{
@@ -61,6 +62,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			if(!empty($package['name']))
 			{
 				$package_path = COMPOSER_ROOT. '/vendor/' . $package['name'];
+
+				// Use full original package path
+				if(preg_match('!^bower-asset/(.+)!', $package['name'], $m))
+					$bower_assets[$package['name']] = $package_path;
+
 				// So detecting root package, not in vendor dir.
 				if(!file_exists($package_path.'/composer.json'))
 					$package_path = COMPOSER_ROOT;
@@ -146,6 +152,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 		$code .= "\nbors::\$package_path = [\n";
 		foreach(\B2\Composer\Cache::getData('config/packages/path', []) as $pkg => $path)
+			$code .= "\t'$pkg' => ".self::make_path($path).",\n";
+		$code .= "];\n";
+
+		$code .= "\nbors::\$bower_asset_packages = [\n";
+		foreach($bower_assets as $pkg => $path)
 			$code .= "\t'$pkg' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
