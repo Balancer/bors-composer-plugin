@@ -14,7 +14,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 {
 	static $bors_data = [];
 
-
 	public function activate(Composer $composer, IOInterface $io)
 	{
 		$this->composer = $composer;
@@ -96,10 +95,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			self::append_extra($package_path, $extra, 'lcml-dir');
 			self::append_extra($package_path, $extra, 'webroot');
 			self::append_extra($package_path, $extra, 'autoroute-prefixes', false);
-			self::append_extra($package_path, $extra, 'route-static', false);
-			self::append_extra($package_path, $extra, 'register-app', false);
-			self::append_extra($package_path, $extra, 'register-view', false);
-			self::append_extra_data($package_path, $extra, 'data');
+
+			if(!empty($extra['bors-data']))
+			{
+				self::append_extra_data($package_path, $extra['bors-data']);
+				unset($extra['bors-data']);
+			}
 
 			if(!empty($extra['bors-app']))
 			{
@@ -118,12 +119,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 			foreach($extra as $key => $val)
 			{
-				if(!preg_match('/^bors-data-(.+)$/', $key, $m))
-					continue;
-
-				self::append_extra($package_path, $extra, $m[1], false);
-				\B2\Composer\Cache::appendData('config/data/'.$m[1], $val);
-				$data_key_names[$m[1]] = true;
+				if($val && preg_match('/^bors-(.+)$/', $key, $m))
+				{
+					self::append_extra_data($package_path, $val, $m[1]);
+					unset($extra[$key]);
+				}
 			}
 		}
 
@@ -181,15 +181,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			$code .= "\t'".addslashes($app)."' => ".self::make_path($path).",\n";
 		$code .= "];\n";
 
-		$code .= "bors::\$composer_route_static     = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/route-static', [])))."];\n";
-		$code .= "bors::\$composer_register_in_app  = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-app', [])))."];\n";
-		$code .= "bors::\$composer_register_in_view = [\n\t".join(",\n\t", array_unique(\B2\Composer\Cache::getData('config/dirs/register-view', [])))."];\n";
+		if(!empty(self::$bors_data))
+			$code .= "bors::\$composer_data = ".var_export(self::$bors_data, true).";\n";
 
-		if(!empty(self::$bors_data['data']))
-			$code .= "bors::\$composer_data = ".var_export(self::$bors_data['data'], true).";\n";
-
-		foreach(array_keys($data_key_names) as $name)
-			$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = ".var_export(\B2\Composer\Cache::getData('config/data/'.$name, []), true).";\n";
+//		foreach(array_keys($data_key_names) as $name)
+//			$code .= "bors::\$composer_extra_".str_replace('-', '_', $name)." = ".var_export(\B2\Composer\Cache::getData('config/data/'.$name, []), true).";\n";
 
 		\B2\Composer\Cache::addAutoload('config/apps', $code);
 	}
@@ -200,7 +196,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		return $path ? "COMPOSER_ROOT.'".addslashes($path)."'" : 'COMPOSER_ROOT';
 	}
 
-	static function append_extra($package_path, $extra, $name, $with_path = true, $type='dirs', $package_name = NULL)
+	static function append_extra($package_path, &$extra, $name, $with_path = true, $type='dirs', $package_name = NULL)
 	{
 		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
 
@@ -247,6 +243,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			else
 				\B2\Composer\Cache::appendData($param_name, "'".addslashes($dirs)."'");
 		}
+
+		unset($extra['bors-'.$name]);
 	}
 
 	static function doPatches($package_with_patch, $package_name, $patches, $io, $all_packages)
@@ -322,36 +320,43 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		return ($executor->execute($command, $output) == 0);
 	}
 
-	static function append_extra_data($package_path, $extra, $name)
+	static function append_extra_data($package_path, $data, $key = NULL)
 	{
 		$package_path = str_replace(dirname(dirname(dirname(__DIR__))), '', $package_path);
 
-		if(empty($extra['bors-'.$name]))
+		if(empty($data))
 			return;
 
-		$data = $extra['bors-'.$name];
-
-		if(is_array($data))
+		// Direct use bors-data
+		if(!$key)
 		{
 			foreach($data as $key => $x)
 			{
 				if(is_numeric($key))
 				{
-					self::$bors_data[$name][] = $x;
+					self::$bors_data[] = $x;
 				}
 				else
 				{
-					if(empty(self::$bors_data[$name][$key]))
-						self::$bors_data[$name][$key] = [];
+					if(empty(self::$bors_data[$key]))
+						self::$bors_data[$key] = [];
 
 					if(!is_array($x))
 						$x = [$x];
 
-					self::$bors_data[$name][$key] = array_merge(self::$bors_data[$name][$key], $x);
+					self::$bors_data[$key] = array_merge(self::$bors_data[$key], $x);
 				}
 			}
 		}
-		else
-			self::$bors_data[$name] = array_merge(self::$bors_data[$name], [$data]);
+		else // Use via key
+		{
+			if(empty(self::$bors_data[$key]))
+				self::$bors_data[$key] = [];
+
+			if(!is_array($data))
+				$data = [$data];
+
+			self::$bors_data[$key] = array_merge(self::$bors_data[$key], $data);
+		}
 	}
 }
