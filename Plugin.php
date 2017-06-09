@@ -356,7 +356,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 			if(!is_array($data))
 				$data = [$data];
 
-			self::$bors_data[$key] = array_unique(array_merge(self::$bors_data[$key], $data));
+			self::$bors_data[$key] = array_merge(self::$bors_data[$key], $data);
 		}
 	}
 }
