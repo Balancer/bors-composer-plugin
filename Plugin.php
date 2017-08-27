@@ -251,6 +251,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	{
 		$io->write("<info>Do patches $package_name: ".print_r($patches, true).'</info>');
 
+		if(exec("which patch") == "")
+			$io->write("<error>Can't find `patch` utility. Try use `apt install patch`</error>");
+
 		$package_path = NULL;
 
 		foreach($all_packages as $package)
