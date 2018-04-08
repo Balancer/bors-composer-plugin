@@ -249,7 +249,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 	static function doPatches($package_with_patch, $package_name, $patches, $io, $all_packages)
 	{
-		$io->write("<info>Do patches $package_name: ".print_r($patches, true).'</info>');
+		$io->write("<info>Do patches $package_name: \n\t- ".join("\n\t- ", $patches)."</info>");
 
 		if(exec("which patch") == "")
 			$io->write("<error>Can't find `patch` utility. Try use `apt install patch`</error>");
