@@ -65,10 +65,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
 				// Use full original package path
 				if(preg_match('!^bower-asset/(.+)!', $package['name'], $m))
-					$bower_assets[$package['name']] = defval($package, 'version' '*');
+					$bower_assets[$package['name']] = defval($package, 'version', '*');
 
 				if(preg_match('!^npm-asset/(.+)!', $package['name'], $m))
-					$npm_assets[$package['name']] = defval($package, 'version' '*');
+					$npm_assets[$package['name']] = defval($package, 'version', '*');
 
 				// So detecting root package, not in vendor dir.
 				if(!file_exists($package_path.'/composer.json'))
